@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox alignment="CENTER" prefHeight="250.0" prefWidth="300.0" spacing="20.0" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.projektjavafxui.Controller">
+    <padding>
+        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+    </padding>
+   <VBox>
+      <children>
+         <TextField fx:id="tf_customerId" text="Please insert your customer ID">
+            <VBox.margin>
+               <Insets bottom="5.0" />
+            </VBox.margin>
+         </TextField>
+          <Button onAction="#generateInvoice" text="Generate Invoice">
+            <opaqueInsets>
+               <Insets />
+            </opaqueInsets>
+         </Button>
+         <Label fx:id="l_progress" alignment="CENTER" contentDisplay="CENTER">
+            <VBox.margin>
+               <Insets bottom="5.0" top="20.0" />
+            </VBox.margin>
+         </Label>
+      </children>
+   </VBox>
+   <Separator prefHeight="15.0" prefWidth="200.0" />
+   <Button fx:id="b_download" disable="true" mnemonicParsing="false" onAction="#downloadInvoice" text="Download Invoice" />
+</VBox>
