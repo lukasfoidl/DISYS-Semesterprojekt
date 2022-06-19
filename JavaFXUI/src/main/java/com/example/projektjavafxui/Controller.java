@@ -15,7 +15,7 @@ import java.net.http.HttpResponse;
 
 public class Controller {
 
-    private static final String API = "";
+    private static final String API = "http://localhost:8081/invoices/";
 
     @FXML
     private TextField tf_customerId;
@@ -28,17 +28,39 @@ public class Controller {
 
     @FXML
     private void generateInvoice() throws IOException, InterruptedException, URISyntaxException {
+        b_download.setDisable(true);
         l_progress.setText("Progressing...");
+
+        if (!isTextNumber(tf_customerId.getText())) {
+            l_progress.setText("Error! Invalid customer id.");
+            return;
+        }
+
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(new URI(API + "/invoice/" + tf_customerId.getText()))
+                .uri(new URI(API + tf_customerId.getText()))
                 .POST(HttpRequest.BodyPublishers.noBody())
                 .build();
         HttpResponse<String> response = HttpClient.newBuilder()
                 .build()
                 .send(request, HttpResponse.BodyHandlers.ofString());
+
+        if (response.statusCode() != 200) {
+            l_progress.setText("Error! The server responded with status code " + response.statusCode() + ".");
+            return;
+        }
+
         tf_customerId.setText("");
         l_progress.setText("");
         b_download.setDisable(false);
+    }
+
+    private boolean isTextNumber(String text) {
+        try {
+            Integer.parseInt(text);
+        } catch (NumberFormatException ex) {
+            return false;
+        }
+        return true;
     }
 
     @FXML
