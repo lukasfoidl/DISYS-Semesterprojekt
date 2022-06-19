@@ -1,16 +1,22 @@
 package com.example.invoicegenerator.controller;
 
+import com.example.invoicegenerator.communication.Producer;
+import com.example.invoicegenerator.dto.CustomerDto;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import static com.example.invoicegenerator.InvoiceGeneratorApplication.BROKER_URL;
+
 @RestController
 public class Controller {
 
-    @PostMapping("/invoices/{customer_Id}")
-    public void startDataGathering(@PathVariable int customer_Id) {
-        System.out.println("startDataGathering(customer_Id " + customer_Id + ")");
+    @PostMapping("/invoices/{customerId}")
+    public void startDataGathering(@PathVariable int customerId) {
+        System.out.println("startDataGathering(id " + customerId + ")");
+
+        Producer.send(new CustomerDto(customerId), "DCD_START", BROKER_URL);
     }
 
 }
