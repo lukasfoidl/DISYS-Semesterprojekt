@@ -1,6 +1,6 @@
 package com.example.invoicegenerator.communication;
 
-import com.example.invoicegenerator.dto.CustomerDto;
+import com.example.invoicegenerator.store.CustomerDto;
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.activemq.ActiveMQPrefetchPolicy;
 

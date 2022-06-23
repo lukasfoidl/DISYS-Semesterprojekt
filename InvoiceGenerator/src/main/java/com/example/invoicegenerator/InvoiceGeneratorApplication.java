@@ -1,10 +1,7 @@
 package com.example.invoicegenerator;
 
 import com.example.invoicegenerator.execution.Executor;
-import com.example.invoicegenerator.services.BaseService;
-import com.example.invoicegenerator.services.DataCollectionDispatcher;
-import com.example.invoicegenerator.services.DataCollectionReceiver;
-import com.example.invoicegenerator.services.StationDataCollector;
+import com.example.invoicegenerator.services.*;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
@@ -24,7 +21,7 @@ public class InvoiceGeneratorApplication {
         services.add(new DataCollectionDispatcher("DCD_START", "DCD_END", BROKER_URL));
         services.add(new StationDataCollector("SDC_START", "SDC_END", BROKER_URL));
         services.add(new DataCollectionReceiver("DCR_START", "DCR_END", BROKER_URL));
-
+        services.add(new PdfGenerator("PG_START", "PG_END", BROKER_URL));
 
         Executor executor = new Executor(services);
         executor.start();

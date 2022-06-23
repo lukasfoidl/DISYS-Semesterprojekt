@@ -1,8 +1,7 @@
 package com.example.invoicegenerator.controller;
 
 import com.example.invoicegenerator.communication.Producer;
-import com.example.invoicegenerator.dto.CustomerDto;
-import org.springframework.web.bind.annotation.GetMapping;
+import com.example.invoicegenerator.store.CustomerDto;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;

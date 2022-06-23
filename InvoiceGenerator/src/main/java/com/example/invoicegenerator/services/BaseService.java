@@ -2,7 +2,7 @@ package com.example.invoicegenerator.services;
 
 import com.example.invoicegenerator.communication.Consumer;
 import com.example.invoicegenerator.communication.Producer;
-import com.example.invoicegenerator.dto.CustomerDto;
+import com.example.invoicegenerator.store.CustomerDto;
 
 public abstract class BaseService implements Runnable {
 

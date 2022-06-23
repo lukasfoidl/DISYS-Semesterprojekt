@@ -1,32 +1,35 @@
-package com.example.invoicegenerator.dto;
+package com.example.invoicegenerator.store;
 
 import java.io.Serializable;
 
 public class CustomerDto implements Serializable {
 
-    private int customerId;
-    private double amount;
-    private int stationId;
+    private int customerId = -1;
+    private double amount = 0;
+    private int stationId = -1;
+    private int count = -1;
+    private boolean isNewJob = false;
 
     // Constructors
-
-    public CustomerDto(
-            int customerId,
-            double amount,
-            int stationId
-    ) {
-        this.customerId = customerId;
-        this.amount = amount;
-        this.stationId = stationId;
-    }
 
     public CustomerDto(int customerId) {
         this.customerId = customerId;
     }
 
+    public CustomerDto(int customerId, int count, boolean isNewJob) {
+        this.customerId = customerId;
+        this.count = count;
+        this.isNewJob = isNewJob;
+    }
+
     public CustomerDto(int customerId, int stationId) {
         this.customerId = customerId;
         this.stationId = stationId;
+    }
+
+    public CustomerDto(int customerId, double amount) {
+        this.customerId = customerId;
+        this.amount = amount;
     }
 
     // Getter and Setter
@@ -53,5 +56,21 @@ public class CustomerDto implements Serializable {
 
     public void setStationId(int stationId) {
         this.stationId = stationId;
+    }
+
+    public int getCount() {
+        return count;
+    }
+
+    public void setCount(int count) {
+        this.count = count;
+    }
+
+    public boolean isNewJob() {
+        return isNewJob;
+    }
+
+    public void setNewJob(boolean newJob) {
+        isNewJob = newJob;
     }
 }
