@@ -1,17 +1,15 @@
 package com.example.invoicegenerator.communication;
 
-import com.example.invoicegenerator.store.CustomerDto;
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.activemq.ActiveMQPrefetchPolicy;
 
 import javax.jms.*;
 
 public class Consumer {
-    public static CustomerDto receive(String queueName, long timeout, String brokerUrl) {
+    public static String receive(String queueName, long timeout, String brokerUrl) {
         // taken from: https://activemq.apache.org/hello-world
 
-        //String returnValue = null;
-        CustomerDto dto = new CustomerDto(-1);
+        String returnValue = null;
         try {
             ActiveMQConnectionFactory factory = new ActiveMQConnectionFactory(brokerUrl);
             var policy = new ActiveMQPrefetchPolicy();
@@ -25,13 +23,8 @@ public class Consumer {
 
             MessageConsumer consumer = session.createConsumer(destination);
             Message message = consumer.receive(timeout);
-//            if(message instanceof  TextMessage){
-//                returnValue = ((TextMessage)message).getText();
-//            }
-
-            if (message instanceof ObjectMessage) {
-                ObjectMessage objectMessage = (ObjectMessage) message;
-                dto = (CustomerDto) objectMessage.getObject();
+            if(message instanceof  TextMessage){
+                returnValue = ((TextMessage)message).getText();
             }
 
             consumer.close();
@@ -42,7 +35,7 @@ public class Consumer {
             e.printStackTrace();
         }
 
-        return dto;
+        return returnValue;
     }
 }
 

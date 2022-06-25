@@ -2,7 +2,6 @@ package com.example.invoicegenerator.services;
 
 import com.example.invoicegenerator.communication.Consumer;
 import com.example.invoicegenerator.communication.Producer;
-import com.example.invoicegenerator.store.CustomerDto;
 
 public abstract class BaseService implements Runnable {
 
@@ -24,16 +23,16 @@ public abstract class BaseService implements Runnable {
     }
 
     private void execute(String inDestination, String outDestination, String brokerUrl) {
-        CustomerDto input = Consumer.receive(inDestination, 10000, brokerUrl);
+        String input = Consumer.receive(inDestination, 10000, brokerUrl);
 
-        if (input.getCustomerId() == -1) {
+        if (input == null) {
             return;
         }
 
-        CustomerDto output = executeInternal(input);
+        String output = executeInternal(input);
         Producer.send(output, outDestination, brokerUrl);
     }
 
-    protected abstract CustomerDto executeInternal(CustomerDto dto);
+    protected abstract String executeInternal(String message);
 }
 

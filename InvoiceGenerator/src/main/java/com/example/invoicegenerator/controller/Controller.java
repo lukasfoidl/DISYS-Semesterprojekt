@@ -1,7 +1,7 @@
 package com.example.invoicegenerator.controller;
 
 import com.example.invoicegenerator.communication.Producer;
-import com.example.invoicegenerator.store.CustomerDto;
+import org.json.JSONObject;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -13,9 +13,12 @@ public class Controller {
 
     @PostMapping("/invoices/{customerId}")
     public void startDataGathering(@PathVariable int customerId) {
+
         System.out.println("startDataGathering(id " + customerId + ")");
 
-        Producer.send(new CustomerDto(customerId), "DCD_START", BROKER_URL);
+        // send message to DataCollectionDispatcher, starts data gathering process
+        String postMessage = new JSONObject().put("customerId", customerId).toString();
+        Producer.send(postMessage, "DCD_START", BROKER_URL);
     }
 
 }
