@@ -1,7 +1,7 @@
 package com.example.invoicegenerator.services;
 
 import com.example.invoicegenerator.communication.Producer;
-import com.example.invoicegenerator.store.CustomerDto;
+import org.json.JSONObject;
 
 import static com.example.invoicegenerator.InvoiceGeneratorApplication.BROKER_URL;
 
@@ -12,15 +12,25 @@ public class StationDataCollector extends BaseService {
     }
 
     @Override
-    protected CustomerDto executeInternal(CustomerDto dto) {
+    protected String executeInternal(String receiveMessage) {
 
-        System.out.println("StationDataCollector: executeInternal(customerId " + dto.getCustomerId() + " stationId " + dto.getStationId() + ")");
+        // extract values from JSON
+        int customerId = new JSONObject(receiveMessage).getInt("customerId");
+        int stationId = new JSONObject(receiveMessage).getInt("stationId");
+
+        System.out.println("StationDataCollector: executeInternal(customerId " + customerId + " stationId " + stationId + ")");
 
         // TODO: load amount for specific customer for specific station from DB
-        dto.setAmount(120.78);
+        double amount = 256.12;
 
         // send message to DataCollectionReceiver with loaded station information
-        Producer.send(dto, "DCR_START", BROKER_URL);
+        String postMessage = new JSONObject()
+                .put("customerId", customerId)
+                .put("stationId", stationId)
+                .put("amount", amount)
+                .put("isNewJob", false)
+                .toString();
+        Producer.send(postMessage, "DCR_START", BROKER_URL);
 
         return null;
 

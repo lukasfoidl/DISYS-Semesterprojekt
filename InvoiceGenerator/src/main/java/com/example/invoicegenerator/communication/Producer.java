@@ -1,13 +1,12 @@
 package com.example.invoicegenerator.communication;
 
-import com.example.invoicegenerator.store.CustomerDto;
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.activemq.ActiveMQPrefetchPolicy;
 
 import javax.jms.*;
 
 public class Producer {
-    public static void send(CustomerDto dto, String queueName, String brokerUrl) {
+    public static void send(String message, String queueName, String brokerUrl) {
         // taken from: https://activemq.apache.org/hello-world
 
         try {
@@ -25,11 +24,11 @@ public class Producer {
             MessageProducer producer = session.createProducer(destination);
             producer.setDeliveryMode(DeliveryMode.NON_PERSISTENT);
 
-            //producer.send(session.createTextMessage(text));
+            producer.send(session.createTextMessage(message));
 
-            ObjectMessage objectMessage = session.createObjectMessage();
-            objectMessage.setObject(dto);
-            producer.send(objectMessage);
+//            ObjectMessage objectMessage = session.createObjectMessage();
+//            objectMessage.setObject(dto);
+//            producer.send(objectMessage);
 
             producer.close();
             session.close();

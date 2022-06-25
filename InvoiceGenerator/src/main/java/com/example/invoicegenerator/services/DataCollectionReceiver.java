@@ -1,8 +1,10 @@
 package com.example.invoicegenerator.services;
 
 import com.example.invoicegenerator.communication.Producer;
-import com.example.invoicegenerator.store.CustomerDto;
-import com.example.invoicegenerator.store.Job;
+import com.example.invoicegenerator.data.Job;
+import com.example.invoicegenerator.data.StationData;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,35 +20,55 @@ public class DataCollectionReceiver extends BaseService {
     }
 
     @Override
-    protected CustomerDto executeInternal(CustomerDto dto) {
+    protected String executeInternal(String receiveMessage) {
+
+        // extract values from JSON
+        int customerId = new JSONObject(receiveMessage).getInt("customerId");
+        Boolean isNewJob = new JSONObject(receiveMessage).getBoolean("isNewJob");
+
+        System.out.println("DataCollectionReceiver: jobs: " + jobs.size());
 
         // get message from DataCollectionDispatcher that new job started
-        if (dto.isNewJob()) {
-            jobs.add(new Job(dto.getCount(), dto.getCustomerId())); // add new Job with number of expected Dtos and corresponding customerId
+        if (isNewJob) {
+            int jobSize = new JSONObject(receiveMessage).getInt("jobSize");
+            jobs.add(new Job(jobSize, customerId)); // add new Job with number of expected Dtos and corresponding customerId
+            System.out.println("DataCollectionReceiver: CREATED NEW JOB -- size: " + jobSize);
             return null;
         }
 
-        //System.out.println("DataCollectionReceiver: jobs: " + jobs.size());
-
         // get message from StationDataCollector with station information
-        for (Job job:
-             jobs) {
+        for (Job job: jobs) {
+
             // add station information to corresponding customer
-            if (job.getCustomerId() == dto.getCustomerId() && job.getCount() > 0) {
-                job.addJob(dto);
-                System.out.println("DataCollectionReceiver: executeInternal(customerId " + dto.getCustomerId() + " stationId " + dto.getStationId() + " amount " + dto.getAmount() + ") -- JOB ADDED");
+            if (job.getCustomerId() == customerId && job.getSize() > 0) {
+
+                int stationId = new JSONObject(receiveMessage).getInt("stationId");
+                double amount = new JSONObject(receiveMessage).getDouble("amount");
+
+                job.addJob(new StationData(stationId, amount));
+
+                System.out.println("DataCollectionReceiver: executeInternal(customerId " + customerId + " stationId " + stationId + " amount " + amount + ") -- STATIONDATA ADDED");
             }
 
-            //System.out.println("DataCollectionReceiver: job.count: " + job.getCount());
+            //System.out.println("DataCollectionReceiver: job.size: " + job.getSize());
 
-            // if all information gathered, send message to PdfGenerator with full invoice amount, and delete job
-            if (job.getCount() == 0) {
-                double sum = 0;
-                for (CustomerDto item :
-                        job.getJobs()) {
-                    sum+=item.getAmount();
+            // if all information gathered, send message to PdfGenerator with data of actual job, delete job afterwards
+            if (job.getSize() == 0) {
+
+                JSONArray array = new JSONArray();
+                for (StationData item : job.getStations()) {
+                    JSONObject obj = new JSONObject()
+                        .put("stationId", item.getStationId())
+                        .put("amount", item.getAmount());
+                    array.put(obj);
                 }
-                Producer.send(new CustomerDto(job.getCustomerId(), sum), "PG_START", BROKER_URL);
+
+                String postMessage = new JSONObject()
+                        .put("customerId", job.getCustomerId())
+                        .put("stationData", array)
+                        .toString();
+                Producer.send(postMessage, "PG_START", BROKER_URL);
+
                 jobs.remove(job);
                 return null;
             }
