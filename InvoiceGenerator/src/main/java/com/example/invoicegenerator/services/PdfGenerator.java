@@ -12,6 +12,9 @@ import java.io.FileOutputStream;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.UUID;
 
 public class PdfGenerator extends BaseService {
 
@@ -28,7 +31,12 @@ public class PdfGenerator extends BaseService {
         ArrayList<StationData> stationData = new ArrayList<>();
         for (Object item : array) {
             JSONObject obj = (JSONObject) item;
-            stationData.add(new StationData(obj.getInt("stationId"), obj.getDouble("amount")));
+            stationData.add(new StationData(
+                    obj.getInt("stationId"),
+                    obj.getDouble("amount"),
+                    obj.getString("date"),
+                    obj.getInt("kwh")
+            ));
         }
 
         System.out.println("PdfGenerator: executeInternal(customerId " + customerId + ")");
@@ -39,20 +47,21 @@ public class PdfGenerator extends BaseService {
     }
 
     private void generatePDF(int customerId, ArrayList<StationData> stationData) {
+        String invoiceNumber = UUID.randomUUID().toString();
         try {
             Document document = new Document();
             PdfWriter.getInstance(document, new FileOutputStream("./Invoices/Invoice_" + customerId + ".pdf"));
             document.open();
 
             // Headline
-            Chunk chunk = createHeadline();
+            Chunk chunk = createHeadline(invoiceNumber);
             document.add(chunk);
 
             document.add(new Paragraph("\n"));
             document.add(new Paragraph("\n"));
 
             // main text
-            String text = createMainText(customerId);
+            String text = createMainText(customerId, invoiceNumber);
             document.add(new Paragraph(text));
 
             // table
@@ -68,14 +77,13 @@ public class PdfGenerator extends BaseService {
         }
     }
 
-    private Chunk createHeadline() {
+    private Chunk createHeadline(String invoiceNumber) {
         Font font = FontFactory.getFont(FontFactory.TIMES_ROMAN, 18, BaseColor.BLACK);
-        Chunk chunk = new Chunk("INVOICE", font);
+        Chunk chunk = new Chunk("INVOICE - " + invoiceNumber, font);
         return chunk;
     }
 
-    private String createMainText(int customerId) {
-        int invoiceNumber = getRandomNumber(100000, 999999);
+    private String createMainText(int customerId, String invoiceNumber) {
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm");
         String date = dtf.format(LocalDateTime.now());
         String text =
@@ -93,20 +101,24 @@ public class PdfGenerator extends BaseService {
             "SeaSpark Bank \n" +
             "IBAN: US10 2000 4787 3358 \n" +
             "BIC: SSAAAAK56 \n" +
-            "Usage: " + invoiceNumber + "\n" +
+            "Reference: " + invoiceNumber + "\n" +
             "\n";
 
         return text;
     }
 
-    // https://stackoverflow.com/questions/5392693/java-random-number-with-given-length
-    private int getRandomNumber(int min, int max) {
-        return (int) Math.floor(Math.random() * (max - min + 1)) + min;
-    }
-
     private PdfPTable createTable(ArrayList<StationData> stationData) {
-        PdfPTable table = new PdfPTable(2);
+        PdfPTable table = new PdfPTable(4);
         addTableHeader(table);
+
+        // https://stackoverflow.com/questions/2784514/sort-arraylist-of-custom-objects-by-property
+        Collections.sort(stationData, new Comparator<StationData>() {
+            @Override
+            public int compare(StationData o1, StationData o2) {
+                return o1.getDate().compareTo(o2.getDate());
+            }
+        });
+
         addRows(table, stationData);
 
         return table;
@@ -114,7 +126,18 @@ public class PdfGenerator extends BaseService {
 
     private void addTableHeader(PdfPTable table) {
         PdfPCell cell;
+
+        cell = new PdfPCell(new Phrase("Date"));
+        cell.setHorizontalAlignment(Element.ALIGN_LEFT);
+        cell.setBackgroundColor(BaseColor.LIGHT_GRAY);
+        table.addCell(cell);
+
         cell = new PdfPCell(new Phrase("Station ID"));
+        cell.setHorizontalAlignment(Element.ALIGN_LEFT);
+        cell.setBackgroundColor(BaseColor.LIGHT_GRAY);
+        table.addCell(cell);
+
+        cell = new PdfPCell(new Phrase("Kwh"));
         cell.setHorizontalAlignment(Element.ALIGN_LEFT);
         cell.setBackgroundColor(BaseColor.LIGHT_GRAY);
         table.addCell(cell);
@@ -131,7 +154,15 @@ public class PdfGenerator extends BaseService {
         for (StationData item : stationData) {
             sum += item.getAmount();
 
+            cell = new PdfPCell(new Phrase(item.getDate()));
+            cell.setHorizontalAlignment(Element.ALIGN_LEFT);
+            table.addCell(cell);
+
             cell = new PdfPCell(new Phrase(Integer.toString(item.getStationId())));
+            cell.setHorizontalAlignment(Element.ALIGN_LEFT);
+            table.addCell(cell);
+
+            cell = new PdfPCell(new Phrase(Integer.toString(item.getKwh())));
             cell.setHorizontalAlignment(Element.ALIGN_LEFT);
             table.addCell(cell);
 
@@ -144,6 +175,14 @@ public class PdfGenerator extends BaseService {
 
         cell = new PdfPCell(new Phrase("TOTAL", font));
         cell.setHorizontalAlignment(Element.ALIGN_LEFT);
+        cell.setBackgroundColor(BaseColor.LIGHT_GRAY);
+        table.addCell(cell);
+
+        cell = new PdfPCell(new Phrase("", font));
+        cell.setBackgroundColor(BaseColor.LIGHT_GRAY);
+        table.addCell(cell);
+
+        cell = new PdfPCell(new Phrase("", font));
         cell.setBackgroundColor(BaseColor.LIGHT_GRAY);
         table.addCell(cell);
 

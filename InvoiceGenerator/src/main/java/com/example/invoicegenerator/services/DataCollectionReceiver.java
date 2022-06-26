@@ -44,8 +44,10 @@ public class DataCollectionReceiver extends BaseService {
 
                 int stationId = new JSONObject(receiveMessage).getInt("stationId");
                 double amount = new JSONObject(receiveMessage).getDouble("amount");
+                String date = new JSONObject(receiveMessage).getString("date");
+                int kwh = new JSONObject(receiveMessage).getInt("kwh");
 
-                job.addJob(new StationData(stationId, amount));
+                job.addJob(new StationData(stationId, amount, date, kwh));
 
                 System.out.println("DataCollectionReceiver: executeInternal(customerId " + customerId + " stationId " + stationId + " amount " + amount + ") -- STATIONDATA ADDED");
             }
@@ -59,7 +61,9 @@ public class DataCollectionReceiver extends BaseService {
                 for (StationData item : job.getStations()) {
                     JSONObject obj = new JSONObject()
                         .put("stationId", item.getStationId())
-                        .put("amount", item.getAmount());
+                        .put("amount", item.getAmount())
+                        .put("date", item.getDate())
+                        .put("kwh", item.getKwh());
                     array.put(obj);
                 }
 
