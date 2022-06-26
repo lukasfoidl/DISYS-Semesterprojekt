@@ -14,24 +14,27 @@ public class PdfGenerator extends BaseService {
 
     @Override
     protected String executeInternal(String receiveMessage) {
+        try {
+            // extract values from JSON
+            int customerId = new JSONObject(receiveMessage).getInt("customerId");
+            JSONArray array = new JSONObject(receiveMessage).getJSONArray("stationData");
+            ArrayList<StationData> stationData = new ArrayList<>();
+            for (Object item : array) {
+                JSONObject obj = (JSONObject) item;
+                stationData.add(new StationData(obj.getInt("stationId"), obj.getDouble("amount")));
+            }
 
-        // extract values from JSON
-        int customerId = new JSONObject(receiveMessage).getInt("customerId");
-        JSONArray array = new JSONObject(receiveMessage).getJSONArray("stationData");
-        ArrayList<StationData> stationData = new ArrayList<>();
-        for (Object item : array) {
-            JSONObject obj = (JSONObject) item;
-            stationData.add(new StationData(obj.getInt("stationId"), obj.getDouble("amount")));
+            double sum = 0;
+            for (StationData item : stationData) {
+                sum += item.getAmount();
+            }
+            System.out.println("PdfGenerator: executeInternal(customerId " + customerId + " amount: " + sum + ")");
+
+            // TODO: generate PDF and make available for client
         }
-
-        double sum = 0;
-        for (StationData item : stationData) {
-            sum += item.getAmount();
+        catch (Exception e){
+            System.out.println(e.getMessage());
         }
-        System.out.println("PdfGenerator: executeInternal(customerId " + customerId + " amount: " + sum + ")");
-
-        // TODO: generate PDF and make available for client
-
         return null;
     }
 }

@@ -13,12 +13,16 @@ public class Controller {
 
     @PostMapping("/invoices/{customerId}")
     public void startDataGathering(@PathVariable int customerId) {
+        try {
+            System.out.println("startDataGathering(id " + customerId + ")");
 
-        System.out.println("startDataGathering(id " + customerId + ")");
-
-        // send message to DataCollectionDispatcher, starts data gathering process
-        String postMessage = new JSONObject().put("customerId", customerId).toString();
-        Producer.send(postMessage, "DCD_START", BROKER_URL);
+            // send message to DataCollectionDispatcher, starts data gathering process
+            String postMessage = new JSONObject().put("customerId", customerId).toString();
+            Producer.send(postMessage, "DCD_START", BROKER_URL);
+        }
+        catch (Exception e){
+            System.out.println(e.getMessage());
+        }
     }
 
 }
