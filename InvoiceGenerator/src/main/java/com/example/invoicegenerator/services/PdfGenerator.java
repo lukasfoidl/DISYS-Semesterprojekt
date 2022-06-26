@@ -9,11 +9,9 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.FileOutputStream;
-import java.lang.reflect.Array;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.stream.Stream;
 
 public class PdfGenerator extends BaseService {
 
@@ -33,13 +31,8 @@ public class PdfGenerator extends BaseService {
             stationData.add(new StationData(obj.getInt("stationId"), obj.getDouble("amount")));
         }
 
-        double sum = 0;
-        for (StationData item : stationData) {
-            sum += item.getAmount();
-        }
-        System.out.println("PdfGenerator: executeInternal(customerId " + customerId + " amount: " + sum + ")");
+        System.out.println("PdfGenerator: executeInternal(customerId " + customerId + ")");
 
-        // TODO: generate PDF and make available for client
         generatePDF(customerId, stationData);
 
         return null;
@@ -48,7 +41,7 @@ public class PdfGenerator extends BaseService {
     private void generatePDF(int customerId, ArrayList<StationData> stationData) {
         try {
             Document document = new Document();
-            PdfWriter.getInstance(document, new FileOutputStream("../Invoices/Invoice_" + customerId + ".pdf"));
+            PdfWriter.getInstance(document, new FileOutputStream("./Invoices/Invoice_" + customerId + ".pdf"));
             document.open();
 
             // Headline
@@ -92,9 +85,10 @@ public class PdfGenerator extends BaseService {
             "\n" +
             date + "\n" +
             "\n" +
-            "Dear Sir/Madam \n" +
-            "Currently, there are outstanding amounts for customer with ID " + customerId + " listed below. " +
-            "Please transfer these within next 14 days to the following bank details. \n" +
+            "Dear Sir/Madam, \n" +
+            "\n" +
+            "Currently, there are outstanding amounts for customer with ID " + customerId + ", the details are listed below. " +
+            "Please transfer the open amount within next 14 days to the following bank details: \n" +
             "\n" +
             "SeaSpark Bank \n" +
             "IBAN: US10 2000 4787 3358 \n" +

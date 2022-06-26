@@ -1,6 +1,7 @@
 package com.example.invoicegenerator.services;
 
 import com.example.invoicegenerator.communication.Producer;
+import com.itextpdf.text.ExceptionConverter;
 import org.json.JSONObject;
 
 import static com.example.invoicegenerator.InvoiceGeneratorApplication.BROKER_URL;
@@ -22,6 +23,12 @@ public class StationDataCollector extends BaseService {
 
         // TODO: load amount for specific customer for specific station from DB
         double amount = 256.12;
+
+//        try {
+//            Thread.sleep(15000);
+//        } catch (Exception e) {
+//            System.out.println("ERROR! " + e.getMessage());
+//        }
 
         // send message to DataCollectionReceiver with loaded station information
         String postMessage = new JSONObject()

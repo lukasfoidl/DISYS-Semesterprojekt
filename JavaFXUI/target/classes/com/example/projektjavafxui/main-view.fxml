@@ -15,7 +15,7 @@
                <Insets bottom="5.0" />
             </VBox.margin>
          </TextField>
-          <Button onAction="#generateInvoice" text="Generate Invoice">
+          <Button fx:id="b_download" onAction="#onDownload" text="Download Invoice">
             <opaqueInsets>
                <Insets />
             </opaqueInsets>
@@ -28,5 +28,5 @@
       </children>
    </VBox>
    <Separator prefHeight="15.0" prefWidth="200.0" />
-   <Button fx:id="b_download" disable="true" mnemonicParsing="false" onAction="#downloadInvoice" text="Download Invoice" />
+   <Button fx:id="b_cancel" mnemonicParsing="false" onAction="#onCancel" text="Cancel" />
 </VBox>
