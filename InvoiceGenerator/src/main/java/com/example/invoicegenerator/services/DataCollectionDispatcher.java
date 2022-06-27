@@ -3,6 +3,8 @@ package com.example.invoicegenerator.services;
 import com.example.invoicegenerator.communication.Producer;
 import org.json.JSONObject;
 
+import java.util.List;
+
 import static com.example.invoicegenerator.InvoiceGeneratorApplication.BROKER_URL;
 
 public class DataCollectionDispatcher extends BaseService {
@@ -20,7 +22,10 @@ public class DataCollectionDispatcher extends BaseService {
             System.out.println("DataCollectionDispatcher: executeInternal(customerId " + customerId + ")");
 
             // TODO: find all stations where this customer has purchased, from DB
-            int[] stationIds = {2, 4, 5};
+
+            DataAccessService dataAccessService = new DataAccessService();
+
+            Integer[] stationIds = dataAccessService.getStationIds(customerId);
 
             // send message to DataCollectionReceiver, that new job started
             String postMessage = new JSONObject()

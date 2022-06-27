@@ -19,10 +19,16 @@ public class PdfGenerator extends BaseService {
             int customerId = new JSONObject(receiveMessage).getInt("customerId");
             JSONArray array = new JSONObject(receiveMessage).getJSONArray("stationData");
             ArrayList<StationData> stationData = new ArrayList<>();
-            for (Object item : array) {
-                JSONObject obj = (JSONObject) item;
+
+            for (int i=0; i < array.length(); ++i){
+                JSONObject obj = array.getJSONObject(i);
                 stationData.add(new StationData(obj.getInt("stationId"), obj.getDouble("amount")));
             }
+
+            /*for (Object item : array) {
+                JSONObject obj = (JSONObject) item;
+                stationData.add(new StationData(obj.getInt("stationId"), obj.getDouble("amount")));
+            }*/
 
             double sum = 0;
             for (StationData item : stationData) {
